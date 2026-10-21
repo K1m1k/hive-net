@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La tua ape</title>
+<style>
+:root { --miele:#f2a516; --scuro:#c97c06; --chiaro:#fff3d6; --cera:#fffaf0; --ink:#2b2118; --ink2:#6b5a48; --bordo:#ecd9b4; --verde:#3f9b5a; --giallo:#e0a400; --rosso:#c4483e; --carta:#fff;
+  --font: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, sans-serif; }
+@media (prefers-color-scheme: dark) { :root { --cera:#1d1710; --carta:#271f16; --ink:#f7ecd8; --ink2:#c8b597; --bordo:#4a3b28; --chiaro:#3a2b12; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--cera); color:var(--ink); font-family:var(--font); font-size:17px; line-height:1.5; }
+.wrap { max-width:860px; margin:0 auto; padding:16px; }
+.card { background:var(--carta); border:2px solid var(--bordo); border-radius:18px; padding:20px; margin:14px 0; box-shadow:0 2px 0 var(--bordo); }
+h1 { margin:0; font-size:1.6rem; } h2 { margin:0 0 10px; font-size:1.2rem; }
+.muted { color:var(--ink2); } .small { font-size:.88rem; }
+.top { display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
+.top svg { width:120px; height:100px; flex:none; }
+.working svg { animation: float 2.6s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform:translate(0,0) rotate(-4deg);} 50% { transform:translate(5px,-7px) rotate(4deg);} }
+.sleeping svg { opacity:.75; }
+@media (prefers-reduced-motion: reduce) { .working svg { animation:none; } }
+.btn { border:0; border-radius:999px; padding:14px 26px; font:inherit; font-weight:800; cursor:pointer; background:var(--miele); color:#2b1a00; box-shadow:0 3px 0 var(--scuro); }
+.btn.ghost { background:transparent; color:var(--ink); box-shadow: inset 0 0 0 2px var(--bordo); }
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+.stat b { font-size:1.6rem; display:block; }
+.lights { display:grid; gap:8px; }
+.light { display:flex; gap:10px; align-items:center; }
+.dot { width:14px; height:14px; border-radius:50%; flex:none; }
+input[type=range] { width:100%; accent-color:var(--scuro); }
+.speed { display:flex; justify-content:space-between; font-size:1.4rem; }
+table.sched { border-collapse:separate; border-spacing:2px; width:100%; table-layout:fixed; user-select:none; }
+table.sched td { height:22px; background:var(--chiaro); border-radius:4px; cursor:pointer; }
+table.sched td.on { background:var(--miele); }
+table.sched th { font-size:.7rem; color:var(--ink2); font-weight:600; }
+.sched-wrap { overflow-x:auto; }
+.sched-wrap table { min-width:560px; }
+label.t { display:flex; gap:10px; align-items:flex-start; margin:10px 0; cursor:pointer; }
+label.t input { margin-top:5px; accent-color:var(--scuro); }
+details summary { cursor:pointer; font-weight:700; }
+input[type=number] { font:inherit; width:110px; padding:6px 10px; border-radius:10px; border:2px solid var(--bordo); background:var(--cera); color:var(--ink); }
+.err { color:var(--rosso); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ape" viewBox="0 0 120 100">
+    <ellipse cx="44" cy="22" rx="20" ry="13" fill="#e8f4ff" stroke="#9cc3e6" stroke-width="2" opacity=".9"/>
+    <ellipse cx="72" cy="20" rx="18" ry="12" fill="#e8f4ff" stroke="#9cc3e6" stroke-width="2" opacity=".9"/>
+    <ellipse cx="60" cy="56" rx="40" ry="30" fill="#f2a516" stroke="#2b2118" stroke-width="3"/>
+    <path d="M42 29 q-6 27 0 54" stroke="#2b2118" stroke-width="9" fill="none"/>
+    <path d="M62 26 q-6 30 0 60" stroke="#2b2118" stroke-width="9" fill="none"/>
+    <circle cx="86" cy="48" r="5" fill="#2b2118"/><circle cx="88" cy="46" r="1.6" fill="#fff"/>
+    <path d="M82 64 q8 6 14 -2" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="96" cy="58" r="4" fill="#ff9a8a" opacity=".7"/>
+    <path d="M88 30 q4 -14 14 -16" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="103" cy="13" r="4" fill="#2b2118"/>
+  </symbol>
+</svg>
+<div class="wrap">
+  <div class="card top" id="hero">
+    <svg><use href="#ape"/></svg>
+    <div style="flex:1;min-width:220px">
+      <div class="muted small" id="name"></div>
+      <h1 id="status">...</h1>
+      <p class="muted" id="reason"></p>
+      <button class="btn" id="pause">Metti in pausa</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Il tuo contributo</h2>
+    <div class="stats">
+      <div class="stat"><span class="muted small">Oggi</span><b id="t-cells">0</b><span class="small">cellette · <span id="t-miele">0</span> miele</span></div>
+      <div class="stat"><span class="muted small">Questa settimana</span><b id="w-miele">0</b><span class="small">miele guadagnato</span></div>
+      <div class="stat"><span class="muted small">Corrente stimata (settimana)</span><b id="w-euro">0 €</b><span class="small">oggi <span id="t-euro">0 €</span> · in tutto <span id="a-euro">0 €</span></span></div>
+    </div>
+    <p class="small muted">Il costo della corrente è una stima: lo paghi tu, quindi te lo mostriamo sempre.</p>
+  </div>
+
+  <div class="card">
+    <h2>Il tuo PC sta bene?</h2>
+    <div class="lights">
+      <div class="light"><span class="dot" id="l-load"></span><span id="l-load-t"></span></div>
+      <div class="light"><span class="dot" id="l-user"></span><span id="l-user-t"></span></div>
+      <div class="light"><span class="dot" id="l-bat"></span><span id="l-bat-t"></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Quanto vuoi aiutare?</h2>
+    <div class="speed"><span title="piano piano">🐢</span><span title="a tutta">🐇</span></div>
+    <input type="range" min="1" max="5" step="1" id="intensity">
+    <p class="small muted" id="intensity-t"></p>
+  </div>
+
+  <div class="card">
+    <h2>Quando?</h2>
+    <p class="small muted">Clicca o trascina per colorare le ore in cui la tua ape può lavorare.</p>
+    <div class="sched-wrap"><table class="sched" id="sched"></table></div>
+    <label class="t"><input type="checkbox" id="idle"> <span>Lavora anche fuori orario se non uso il PC da 10 minuti</span></label>
+    <label class="t"><input type="checkbox" id="useract"> <span>Fermati quando sto usando il PC</span></label>
+    <label class="t"><input type="checkbox" id="battery"> <span>Lavora anche quando il portatile va a batteria</span></label>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>Per esperti</summary>
+      <p class="small">Server: <code id="server"></code></p>
+      <p class="small">Consumo stimato per core al lavoro: <input type="number" id="watts" min="1" max="200" step="1"> W ·
+        prezzo corrente: <input type="number" id="euro" min="0" max="2" step="0.01"> €/kWh</p>
+      <p class="small">Carico degli altri programmi: <span id="x-load"></span>% · cellette in attesa: <span id="x-queue"></span></p>
+      <p class="small err" id="x-err"></p>
+    </details>
+  </div>
+</div>
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+const DAYS = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+const SPEED = { 1: 'Piano piano: lunghe pause tra una celletta e l\'altra', 2: 'Con calma', 3: 'Normale', 4: 'Svelta', 5: 'A tutta: senza pause (solo quando non usi il PC)' };
+const LABEL = { lavoro: 'Al lavoro', riposo: 'A riposo', pausa: 'In pausa', offline: 'Non raggiunge l\'alveare', avvio: 'Si sta svegliando', bloccata: 'Ferma per sicurezza' };
+let state = null, schedule = null, painting = null;
+
+async function save(patch) {
+  const r = await fetch('/api/settings', { method: 'POST', headers: { 'content-type': 'application/json', 'x-alveare': '1' }, body: JSON.stringify(patch) });
+  if (r.ok) render(await r.json());
+}
+function eur(v) { return v.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 3 }) + ' €'; }
+function light(id, color, text) { $('#' + id).style.background = `var(--${color})`; $('#' + id + '-t').textContent = text; }
+
+function drawSchedule() {
+  const t = $('#sched');
+  let h = '<tr><th></th>' + Array.from({ length: 24 }, (_, i) => `<th>${i % 3 === 0 ? i : ''}</th>`).join('') + '</tr>';
+  schedule.forEach((row, d) => { h += `<tr><th>${DAYS[d]}</th>` + row.map((on, hr) => `<td data-d="${d}" data-h="${hr}" class="${on ? 'on' : ''}" title="${DAYS[d]} ${hr}:00"></td>`).join('') + '</tr>'; });
+  t.innerHTML = h;
+}
+$('#sched').addEventListener('pointerdown', (e) => {
+  const td = e.target.closest('td'); if (!td) return;
+  painting = !schedule[td.dataset.d][td.dataset.h];
+  schedule[td.dataset.d][td.dataset.h] = painting; td.classList.toggle('on', painting);
+});
+$('#sched').addEventListener('pointerover', (e) => {
+  if (painting === null) return;
+  const td = e.target.closest('td'); if (!td) return;
+  schedule[td.dataset.d][td.dataset.h] = painting; td.classList.toggle('on', painting);
+});
+window.addEventListener('pointerup', () => { if (painting !== null) { painting = null; save({ schedule }); } });
+
+function render(s) {
+  state = s;
+  $('#name').textContent = s.node_name;
+  $('#status').textContent = LABEL[s.status] || s.status;
+  $('#reason').textContent = s.reason;
+  $('#hero').className = 'card top ' + (s.status === 'lavoro' ? 'working' : 'sleeping');
+  $('#pause').textContent = s.settings.manual_pause ? 'Riprendi' : 'Metti in pausa';
+  $('#t-cells').textContent = s.today.cells; $('#t-miele').textContent = s.today.miele.toLocaleString('it-IT');
+  $('#w-miele').textContent = s.week.miele.toLocaleString('it-IT');
+  $('#w-euro').textContent = eur(s.week.euro); $('#t-euro').textContent = eur(s.today.euro); $('#a-euro').textContent = eur(s.total.euro);
+  const load = s.health.others_load;
+  light('l-load', load > 60 ? 'rosso' : load > 30 ? 'giallo' : 'verde', `Altri programmi: ${load > 60 ? 'molto impegnato' : load > 30 ? 'un po\' impegnato' : 'tranquillo'}`);
+  const idle = s.health.user_idle_s;
+  light('l-user', idle === null ? 'giallo' : idle < 120 ? 'giallo' : 'verde', idle === null ? 'Non riesco a capire se stai usando il PC: mi regolo sul carico' : idle < 120 ? 'Stai usando il PC' : 'Non stai usando il PC');
+  const b = s.health.battery;
+  light('l-bat', !b.present ? 'verde' : b.onBattery ? 'giallo' : 'verde', !b.present ? 'Alimentazione da rete' : `${b.onBattery ? 'A batteria' : 'In carica'} (${b.percent ?? '?'}%)`);
+  if (document.activeElement !== $('#intensity')) $('#intensity').value = s.settings.intensity;
+  $('#intensity-t').textContent = SPEED[s.settings.intensity];
+  if (painting === null) { schedule = s.settings.schedule.map((r) => r.slice()); drawSchedule(); }
+  $('#idle').checked = s.settings.always_when_idle; $('#useract').checked = s.settings.pause_when_user_active; $('#battery').checked = s.settings.work_on_battery;
+  $('#server').textContent = s.server;
+  if (document.activeElement !== $('#watts')) $('#watts').value = s.settings.energy.watts_per_core;
+  if (document.activeElement !== $('#euro')) $('#euro').value = s.settings.energy.euro_per_kwh;
+  $('#x-load').textContent = load; $('#x-queue').textContent = s.queue; $('#x-err').textContent = s.last_error || '';
+}
+$('#pause').onclick = () => save({ manual_pause: !state.settings.manual_pause });
+$('#intensity').onchange = (e) => save({ intensity: Number(e.target.value) });
+$('#idle').onchange = (e) => save({ always_when_idle: e.target.checked });
+$('#useract').onchange = (e) => save({ pause_when_user_active: e.target.checked });
+$('#battery').onchange = (e) => save({ work_on_battery: e.target.checked });
+const energy = () => save({ energy: { watts_per_core: Number($('#watts').value) || 10, euro_per_kwh: Number($('#euro').value) || 0 } });
+$('#watts').onchange = energy; $('#euro').onchange = energy;
+async function poll() { try { render(await (await fetch('/api/state')).json()); } catch { $('#status').textContent = 'Il programma dell\'ape non risponde'; } setTimeout(poll, 3000); }
+poll();
+</script>
+</body>
+</html>
