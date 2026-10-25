@@ -1,4 +1,0 @@
-starlette>=0.40
-uvicorn>=0.30
-cryptography>=42
-numpy>=1.26

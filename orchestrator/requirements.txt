@@ -1,0 +1,6 @@
+# Minimum versions with all known security fixes (October 2026); tested up to:
+# starlette 1.10.0, uvicorn 0.54.0, cryptography 50.0.2, numpy 2.5.4
+starlette>=1.1.0,<2
+uvicorn>=0.54
+cryptography>=49.0.0
+numpy>=2.0

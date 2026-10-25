@@ -1,6 +1,9 @@
 .venv/
 data/
+demo-data/
 __pycache__/
 *.pyc
 node_modules/
-.alveare/
+.hivenet/
+.test-runs/
+.backup-*/

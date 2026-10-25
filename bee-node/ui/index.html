@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your bee</title>
+<style>
+:root { --honey:#f2a516; --dark:#c97c06; --light:#fff3d6; --wax:#fffaf0; --ink:#2b2118; --ink2:#6b5a48; --border:#ecd9b4; --green:#3f9b5a; --yellow:#e0a400; --red:#c4483e; --paper:#fff;
+  --font: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, sans-serif; }
+@media (prefers-color-scheme: dark) { :root { --wax:#1d1710; --paper:#271f16; --ink:#f7ecd8; --ink2:#c8b597; --border:#4a3b28; --light:#3a2b12; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--wax); color:var(--ink); font-family:var(--font); font-size:17px; line-height:1.5; }
+.wrap { max-width:860px; margin:0 auto; padding:16px; }
+.card { background:var(--paper); border:2px solid var(--border); border-radius:18px; padding:20px; margin:14px 0; box-shadow:0 2px 0 var(--border); }
+h1 { margin:0; font-size:1.6rem; } h2 { margin:0 0 10px; font-size:1.2rem; }
+.muted { color:var(--ink2); } .small { font-size:.88rem; }
+.top { display:flex; gap:18px; align-items:center; flex-wrap:wrap; }
+.top svg { width:120px; height:100px; flex:none; }
+.working svg { animation: float 2.6s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform:translate(0,0) rotate(-4deg);} 50% { transform:translate(5px,-7px) rotate(4deg);} }
+.sleeping svg { opacity:.75; }
+@media (prefers-reduced-motion: reduce) { .working svg { animation:none; } }
+.btn { border:0; border-radius:999px; padding:14px 26px; font:inherit; font-weight:800; cursor:pointer; background:var(--honey); color:#2b1a00; box-shadow:0 3px 0 var(--dark); }
+.btn.ghost { background:transparent; color:var(--ink); box-shadow: inset 0 0 0 2px var(--border); }
+.stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; }
+.stat b { font-size:1.6rem; display:block; }
+.lights { display:grid; gap:8px; }
+.light { display:flex; gap:10px; align-items:center; }
+.dot { width:14px; height:14px; border-radius:50%; flex:none; }
+input[type=range] { width:100%; accent-color:var(--dark); }
+.speed { display:flex; justify-content:space-between; font-size:1.4rem; }
+table.sched { border-collapse:separate; border-spacing:2px; width:100%; table-layout:fixed; user-select:none; }
+table.sched td { height:22px; background:var(--light); border-radius:4px; cursor:pointer; }
+table.sched td.on { background:var(--honey); }
+table.sched th { font-size:.7rem; color:var(--ink2); font-weight:600; }
+.sched-wrap { overflow-x:auto; }
+.sched-wrap table { min-width:560px; }
+label.t { display:flex; gap:10px; align-items:flex-start; margin:10px 0; cursor:pointer; }
+label.t input { margin-top:5px; accent-color:var(--dark); }
+details summary { cursor:pointer; font-weight:700; }
+input[type=number] { font:inherit; width:110px; padding:6px 10px; border-radius:10px; border:2px solid var(--border); background:var(--wax); color:var(--ink); }
+.err { color:var(--red); }
+.bars { display:flex; height:22px; border-radius:8px; overflow:hidden; background:var(--light); margin:10px 0 6px; }
+.bars i { display:block; height:100%; }
+.legend { display:flex; flex-wrap:wrap; gap:4px 14px; font-size:.8rem; color:var(--ink2); }
+.legend span::before { content:''; display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; background:var(--c); vertical-align:-1px; }
+.btn.small { padding:8px 16px; font-size:.9rem; text-decoration:none; display:inline-block; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="bee" viewBox="0 0 120 100">
+    <ellipse cx="44" cy="22" rx="20" ry="13" fill="#e8f4ff" stroke="#9cc3e6" stroke-width="2" opacity=".9"/>
+    <ellipse cx="72" cy="20" rx="18" ry="12" fill="#e8f4ff" stroke="#9cc3e6" stroke-width="2" opacity=".9"/>
+    <ellipse cx="60" cy="56" rx="40" ry="30" fill="#f2a516" stroke="#2b2118" stroke-width="3"/>
+    <path d="M42 29 q-6 27 0 54" stroke="#2b2118" stroke-width="9" fill="none"/>
+    <path d="M62 26 q-6 30 0 60" stroke="#2b2118" stroke-width="9" fill="none"/>
+    <circle cx="86" cy="48" r="5" fill="#2b2118"/><circle cx="88" cy="46" r="1.6" fill="#fff"/>
+    <path d="M82 64 q8 6 14 -2" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="96" cy="58" r="4" fill="#ff9a8a" opacity=".7"/>
+    <path d="M88 30 q4 -14 14 -16" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="103" cy="13" r="4" fill="#2b2118"/>
+  </symbol>
+</svg>
+<div class="wrap">
+  <div class="card top" id="hero">
+    <svg><use href="#bee"/></svg>
+    <div style="flex:1;min-width:220px">
+      <div class="muted small" id="name"></div>
+      <h1 id="status">...</h1>
+      <p class="muted" id="reason"></p>
+      <button class="btn" id="pause">Pause</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Your contribution</h2>
+    <div class="stats">
+      <div class="stat"><span class="muted small">Today</span><b id="t-cells">0</b><span class="small">cells · <span id="t-honey">0</span> honey</span></div>
+      <div class="stat"><span class="muted small">This week</span><b id="w-honey">0</b><span class="small">honey earned</span></div>
+      <div class="stat"><span class="muted small">Estimated electricity (this week)</span><b id="w-euro">€0</b><span class="small">today <span id="t-euro">€0</span> · all time <span id="a-euro">€0</span></span></div>
+    </div>
+    <p class="small muted">The electricity cost is an estimate: you are the one paying for it, so we always show it.</p>
+  </div>
+
+  <div class="card">
+    <h2>Is your PC doing fine?</h2>
+    <div class="lights">
+      <div class="light"><span class="dot" id="l-load"></span><span id="l-load-t"></span></div>
+      <div class="light"><span class="dot" id="l-user"></span><span id="l-user-t"></span></div>
+      <div class="light"><span class="dot" id="l-bat"></span><span id="l-bat-t"></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>How much do you want to help?</h2>
+    <div class="speed"><span title="gently">🐢</span><span title="flat out">🐇</span></div>
+    <input type="range" min="1" max="5" step="1" id="intensity">
+    <p class="small muted" id="intensity-t"></p>
+  </div>
+
+  <div class="card">
+    <h2>When?</h2>
+    <p class="small muted">Click or drag to colour the hours when your bee may work.</p>
+    <div class="sched-wrap"><table class="sched" id="sched"></table></div>
+    <label class="t"><input type="checkbox" id="idle"> <span>Also work outside these hours if I haven't used the PC for 10 minutes</span></label>
+    <label class="t"><input type="checkbox" id="useract"> <span>Stop while I'm using the PC</span></label>
+    <label class="t"><input type="checkbox" id="battery"> <span>Also work when the laptop is on battery</span></label>
+  </div>
+
+  <div class="card">
+    <h2>How your bee is working</h2>
+    <p class="small muted" id="p-none">As soon as your bee completes a few cells, you will see here where the time goes.</p>
+    <div id="p-box" hidden>
+      <div class="stats">
+        <div class="stat"><span class="muted small">Useful work</span><b id="p-useful">0%</b><span class="small">of the time is actual computation</span></div>
+        <div class="stat"><span class="muted small">Network</span><b id="p-down">0 KB/s</b><span class="small">incoming · <span id="p-up">0 KB/s</span> outgoing</span></div>
+        <div class="stat"><span class="muted small">Resources used</span><b id="p-cpu">0 cores</b><span class="small">of <span id="p-cores"></span> · <span id="p-ram">0</span> MB of memory</span></div>
+        <div class="stat"><span class="muted small">Speed</span><b id="p-rate">0</b><span class="small">texts per second</span></div>
+      </div>
+      <div class="bars" id="p-bars"></div>
+      <div class="legend" id="p-legend"></div>
+      <p class="small">Bottleneck: <b id="p-bottle"></b> <span class="muted">(last <span id="p-n"></span> cells)</span></p>
+      <a class="btn ghost small" href="/api/report" download>Download report</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <details>
+      <summary>For experts</summary>
+      <p class="small">Server: <code id="server"></code></p>
+      <p class="small">Estimated power draw per busy core: <input type="number" id="watts" min="1" max="200" step="1"> W ·
+        electricity price: <input type="number" id="euro" min="0" max="2" step="0.01"> €/kWh</p>
+      <p class="small">Load from other programs: <span id="x-load"></span>% · cells waiting: <span id="x-queue"></span></p>
+      <p class="small err" id="x-err"></p>
+    </details>
+  </div>
+</div>
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const SPEED = { 1: 'Gently: long breaks between cells', 2: 'Relaxed', 3: 'Normal', 4: 'Brisk', 5: 'Flat out: no breaks (only while you are not using the PC)' };
+const LABEL = { working: 'Working', resting: 'Resting', paused: 'Paused', offline: 'Cannot reach the hive', starting: 'Waking up', blocked: 'Stopped for safety' };
+let state = null, schedule = null, painting = null;
+
+async function save(patch) {
+  const r = await fetch('/api/settings', { method: 'POST', headers: { 'content-type': 'application/json', 'x-hivenet': '1' }, body: JSON.stringify(patch) });
+  if (r.ok) render(await r.json());
+}
+function eur(v) { return '€' + v.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 3 }); }
+function light(id, color, text) { $('#' + id).style.background = `var(--${color})`; $('#' + id + '-t').textContent = text; }
+
+function drawSchedule() {
+  const t = $('#sched');
+  let h = '<tr><th></th>' + Array.from({ length: 24 }, (_, i) => `<th>${i % 3 === 0 ? i : ''}</th>`).join('') + '</tr>';
+  schedule.forEach((row, d) => { h += `<tr><th>${DAYS[d]}</th>` + row.map((on, hr) => `<td data-d="${d}" data-h="${hr}" class="${on ? 'on' : ''}" title="${DAYS[d]} ${hr}:00"></td>`).join('') + '</tr>'; });
+  t.innerHTML = h;
+}
+$('#sched').addEventListener('pointerdown', (e) => {
+  const td = e.target.closest('td'); if (!td) return;
+  painting = !schedule[td.dataset.d][td.dataset.h];
+  schedule[td.dataset.d][td.dataset.h] = painting; td.classList.toggle('on', painting);
+});
+$('#sched').addEventListener('pointerover', (e) => {
+  if (painting === null) return;
+  const td = e.target.closest('td'); if (!td) return;
+  schedule[td.dataset.d][td.dataset.h] = painting; td.classList.toggle('on', painting);
+});
+window.addEventListener('pointerup', () => { if (painting !== null) { painting = null; save({ schedule }); } });
+
+function render(s) {
+  state = s;
+  $('#name').textContent = s.node_name;
+  $('#status').textContent = LABEL[s.status] || s.status;
+  $('#reason').textContent = s.reason;
+  $('#hero').className = 'card top ' + (s.status === 'working' ? 'working' : 'sleeping');
+  $('#pause').textContent = s.settings.manual_pause ? 'Resume' : 'Pause';
+  $('#t-cells').textContent = s.today.cells; $('#t-honey').textContent = s.today.honey.toLocaleString('en-GB');
+  $('#w-honey').textContent = s.week.honey.toLocaleString('en-GB');
+  $('#w-euro').textContent = eur(s.week.euro); $('#t-euro').textContent = eur(s.today.euro); $('#a-euro').textContent = eur(s.total.euro);
+  const load = s.health.others_load;
+  light('l-load', load > 60 ? 'red' : load > 30 ? 'yellow' : 'green', `Other programs: ${load > 60 ? 'very busy' : load > 30 ? 'somewhat busy' : 'quiet'}`);
+  const idle = s.health.user_idle_s;
+  light('l-user', idle === null ? 'yellow' : idle < 120 ? 'yellow' : 'green', idle === null ? 'Cannot tell whether you are using the PC: going by the load instead' : idle < 120 ? 'You are using the PC' : 'You are not using the PC');
+  const b = s.health.battery;
+  light('l-bat', !b.present ? 'green' : b.onBattery ? 'yellow' : 'green', !b.present ? 'Mains power' : `${b.onBattery ? 'On battery' : 'Charging'} (${b.percent ?? '?'}%)`);
+  if (document.activeElement !== $('#intensity')) $('#intensity').value = s.settings.intensity;
+  $('#intensity-t').textContent = SPEED[s.settings.intensity];
+  if (painting === null) { schedule = s.settings.schedule.map((r) => r.slice()); drawSchedule(); }
+  $('#idle').checked = s.settings.always_when_idle; $('#useract').checked = s.settings.pause_when_user_active; $('#battery').checked = s.settings.work_on_battery;
+  $('#server').textContent = s.server;
+  if (document.activeElement !== $('#watts')) $('#watts').value = s.settings.energy.watts_per_core;
+  if (document.activeElement !== $('#euro')) $('#euro').value = s.settings.energy.euro_per_kwh;
+  renderPerf(s.perf);
+  $('#x-load').textContent = load; $('#x-queue').textContent = s.queue; $('#x-err').textContent = s.last_error || '';
+}
+const PCOL = { download_ms: '#5b8def', wait_ms: '#b9a37e', key_ms: '#9b6bd6', sandbox_ms: '#d68a3c', decrypt_ms: '#d6b23c', compile_ms: '#c97c06', wasm_ms: '#3f9b5a', seal_ms: '#8fbf5a', upload_ms: '#4fb3c9' };
+function renderPerf(p) {
+  if (!p || !p.cells) { $('#p-box').hidden = true; $('#p-none').hidden = false; return; }
+  $('#p-box').hidden = false; $('#p-none').hidden = true;
+  const n = (v) => v.toLocaleString('en-GB', { maximumFractionDigits: 1 });
+  $('#p-useful').textContent = n(p.useful_share) + '%';
+  $('#p-down').textContent = n(p.down_kbs) + ' KB/s'; $('#p-up').textContent = n(p.up_kbs) + ' KB/s';
+  $('#p-cpu').textContent = p.cpu_cores.toLocaleString('en-GB', { maximumFractionDigits: 2 }) + ' cores'; $('#p-cores').textContent = p.cores; $('#p-ram').textContent = n(p.rss_mb);
+  $('#p-rate').textContent = n(p.records_s);
+  $('#p-bars').innerHTML = p.phases.filter((x) => x.share > 0).map((x) => `<i style="width:${x.share}%;background:${PCOL[x.key]}" title="${x.label}: ${n(x.share)}% · mean ${n(x.avg_ms)} ms"></i>`).join('');
+  $('#p-legend').innerHTML = p.phases.map((x) => `<span style="--c:${PCOL[x.key]}">${x.label} ${n(x.share)}%</span>`).join('');
+  $('#p-bottle').textContent = p.bottleneck; $('#p-n').textContent = p.cells;
+}
+$('#pause').onclick = () => save({ manual_pause: !state.settings.manual_pause });
+$('#intensity').onchange = (e) => save({ intensity: Number(e.target.value) });
+$('#idle').onchange = (e) => save({ always_when_idle: e.target.checked });
+$('#useract').onchange = (e) => save({ pause_when_user_active: e.target.checked });
+$('#battery').onchange = (e) => save({ work_on_battery: e.target.checked });
+const energy = () => save({ energy: { watts_per_core: Number($('#watts').value) || 10, euro_per_kwh: Number($('#euro').value) || 0 } });
+$('#watts').onchange = energy; $('#euro').onchange = energy;
+async function poll() { try { render(await (await fetch('/api/state')).json()); } catch { $('#status').textContent = 'The bee program is not responding'; } setTimeout(poll, 3000); }
+poll();
+</script>
+</body>
+</html>

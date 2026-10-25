@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HiveNet</title>
+<meta name="description" content="Lend your PC when you are not using it and get AI processing for free.">
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cellipse cx='32' cy='36' rx='18' ry='14' fill='%23f2a516'/%3E%3C/svg%3E">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="bee" viewBox="0 0 120 100">
+    <ellipse cx="44" cy="22" rx="20" ry="13" fill="#e8f4ff" stroke="#9cc3e6" stroke-width="2" opacity=".9"/>
+    <ellipse cx="72" cy="20" rx="18" ry="12" fill="#e8f4ff" stroke="#9cc3e6" stroke-width="2" opacity=".9"/>
+    <ellipse cx="60" cy="56" rx="40" ry="30" fill="#f2a516" stroke="#2b2118" stroke-width="3"/>
+    <path d="M42 29 q-6 27 0 54" stroke="#2b2118" stroke-width="9" fill="none"/>
+    <path d="M62 26 q-6 30 0 60" stroke="#2b2118" stroke-width="9" fill="none"/>
+    <circle cx="86" cy="48" r="5" fill="#2b2118"/><circle cx="88" cy="46" r="1.6" fill="#fff"/>
+    <path d="M82 64 q8 6 14 -2" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="96" cy="58" r="4" fill="#ff9a8a" opacity=".7"/>
+    <path d="M88 30 q4 -14 14 -16" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="103" cy="13" r="4" fill="#2b2118"/>
+    <path d="M20 58 l-12 4" stroke="#2b2118" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="#" data-go="home"><svg><use href="#bee"/></svg>HiveNet</a>
+    <nav class="tabs" id="tabs"></nav>
+  </header>
+
+  <!-- ===================== LANDING PAGE (signed out) ===================== -->
+  <main id="v-landing" class="hidden">
+    <div class="hero">
+      <div>
+        <h1>Lend your PC when you're not using it.<br>Get AI processing for free.</h1>
+        <p class="lead">Your bee works for the hive while you sleep. In return you earn honey, which you can spend to have your own texts processed.</p>
+        <p><button class="btn" data-open="dlg-register">Join the hive</button>
+           <button class="btn ghost" data-open="dlg-login">I already have an account</button></p>
+        <p class="muted small">Free. Stop whenever you like, with a single click.</p>
+      </div>
+      <div class="hive" id="hive-art"></div>
+    </div>
+
+    <section class="grid g3">
+      <div class="card"><div class="big-number" id="pub-bees">0</div><div class="muted">bees working right now</div></div>
+      <div class="card"><div class="big-number" id="pub-today">0</div><div class="muted">cells completed today</div></div>
+      <div class="card"><div class="muted small">This week's community honeycomb</div>
+        <div class="progress" style="margin:10px 0"><i id="pub-goal-bar" style="width:0"></i></div>
+        <div class="small"><b id="pub-week">0</b> of <span id="pub-goal">0</span> cells</div></div>
+    </section>
+
+    <section>
+      <h2>How it works</h2>
+      <div class="grid g3 steps">
+        <div class="step"><h3>Hatch your bee</h3><p class="muted">Install a small program and choose when your PC is free, for example at night.</p></div>
+        <div class="step"><h3>It works, you rest</h3><p class="muted">It completes small cells of work. As soon as you come back to your PC, it steps aside.</p></div>
+        <div class="step"><h3>Spend your honey</h3><p class="muted">Use honey to have the hive clean, count and organise your texts.</p></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Your data stays safe</h2>
+      <p>Before anything leaves your PC, your texts are scrubbed: email addresses, phone numbers, IBANs and Italian tax codes are removed. Other bees only receive small encrypted, shuffled pieces and never learn who they come from. Once the job is done, the originals are deleted.</p>
+      <p class="muted small">For now the hive only accepts non-sensitive texts. <a href="#" data-go="privacy">Read how we protect your data</a>.</p>
+    </section>
+  </main>
+
+  <!-- ===================== MY HIVE ===================== -->
+  <main id="v-home" class="hidden">
+    <section class="grid g2">
+      <div class="card" style="display:flex;gap:16px;align-items:center">
+        <svg class="flying" style="width:110px;height:92px;flex:none"><use href="#bee"/></svg>
+        <div style="flex:1">
+          <div class="muted small">Hi <b id="me-name"></b>, your bee is a</div>
+          <h2 id="me-level" style="margin:2px 0 8px"></h2>
+          <div class="progress"><i id="me-level-bar" style="width:0"></i></div>
+          <div class="small muted" id="me-level-next" style="margin-top:6px"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="muted small">Your honey</div>
+        <div class="big-number"><span id="me-honey">0</span> <span style="font-size:1.4rem">🍯</span></div>
+        <p class="small muted" id="me-week"></p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Your bees</h2>
+      <div class="list" id="me-nodes"></div>
+      <details style="margin-top:14px">
+        <summary class="btn ghost small" style="list-style:none">+ Hatch a new bee</summary>
+        <div style="margin-top:12px">
+          <p>The computer you want to put to work needs <b>Node.js 22.23.2, 24.18.1, 26.5.1 or later</b>. Download your bee's program, open a terminal in its folder and run:</p>
+          <pre id="setup-cmd"></pre>
+          <p class="small muted">It will ask for your password. Then start the bee with <code>node hivenet-bee.js start</code> and open <code>http://127.0.0.1:7777</code> to choose its hours and intensity.</p>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>Your badges</h2>
+      <div class="medals" id="me-medals"></div>
+      <p class="small muted" style="margin-top:10px">Badges are never lost: if you take a break, they stay yours.</p>
+    </section>
+
+    <section class="grid g2">
+      <div class="card">
+        <h2>Community honeycomb</h2>
+        <p class="muted small">This week's shared goal for the whole hive.</p>
+        <div class="progress"><i id="home-goal-bar" style="width:0"></i></div>
+        <p class="small" style="margin-top:6px"><b id="home-week">0</b> of <span id="home-goal">0</span> cells</p>
+      </div>
+      <div class="card">
+        <h2>Group of friends</h2>
+        <div id="group-box"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== SUBMIT A JOB ===================== -->
+  <main id="v-jobs" class="hidden">
+    <section class="card">
+      <h2>Submit a job to the hive</h2>
+      <p class="muted">Paste your texts, one sentence or paragraph per line, or upload a .txt file.</p>
+      <label class="f" for="job-name">Job name</label>
+      <input type="text" id="job-name" placeholder="e.g. shop reviews" maxlength="80">
+      <label class="f" for="job-text">Texts</label>
+      <textarea id="job-text" placeholder="One text per line..."></textarea>
+      <p><label class="btn ghost small file-pick">Upload a .txt file<input type="file" id="job-file" accept=".txt,text/plain"></label></p>
+      <label class="check"><input type="checkbox" checked disabled> <span><b>Cleaning</b><br><span class="small muted">Fixes spacing and capitalisation and finds duplicate texts.</span></span></label>
+      <label class="check"><input type="checkbox" id="op-stats" checked> <span><b>Counts</b><br><span class="small muted">How many texts, words and sentences.</span></span></label>
+      <label class="check"><input type="checkbox" id="op-embed" checked> <span><b>Meaning map</b><br><span class="small muted">Finds similar texts even when they use different words.</span></span></label>
+      <div class="row" style="margin-top:10px">
+        <span id="job-estimate" class="muted small">Type something to see how much honey it takes.</span>
+        <button class="btn" id="job-send">Send to the hive</button>
+      </div>
+      <p class="small muted" style="margin-top:10px">Before sending, email addresses, phone numbers, IBANs and Italian tax codes are removed on your PC. Personal names are not detected: do not include sensitive data.</p>
+    </section>
+    <section>
+      <h2>Your jobs</h2>
+      <div class="list" id="jobs-list"></div>
+    </section>
+  </main>
+
+  <!-- ===================== SEARCH ===================== -->
+  <main id="v-search" class="hidden">
+    <section class="card">
+      <h2>Search the hive's memory</h2>
+      <p class="muted">Search the texts of your own jobs, even using different words from the ones they contain.</p>
+      <div class="row" style="background:none;border:0;padding:0">
+        <input type="text" id="search-q" placeholder="What are you looking for?" style="flex:1">
+        <button class="btn" id="search-go">Search</button>
+      </div>
+      <div class="list" id="search-res" style="margin-top:14px"></div>
+    </section>
+  </main>
+
+  <!-- ===================== HONEY ===================== -->
+  <main id="v-honey" class="hidden">
+    <section class="card">
+      <h2>Your honey, transaction by transaction</h2>
+      <p class="muted small">Every drop shown here matches a recorded transaction.</p>
+      <div class="list" id="ledger-list"></div>
+    </section>
+  </main>
+
+  <!-- ===================== PRIVACY ===================== -->
+  <main id="v-privacy" class="hidden">
+    <section class="card">
+      <h2>How we protect your data, in plain words</h2>
+      <ol>
+        <li><b>Scrubbed on your PC.</b> Before anything is sent, your browser removes email addresses, phone numbers, IBANs and Italian tax codes. Personal names are not detected, which is why the hive only accepts non-sensitive texts.</li>
+        <li><b>Small, shuffled pieces.</b> The job is split into many small cells, mixed with other people's cells and without your name.</li>
+        <li><b>Always encrypted.</b> Cells travel, and sit on other bees' disks, encrypted. The key only arrives at the moment of computation and is destroyed straight afterwards.</li>
+        <li><b>A closed pen.</b> The computation runs in a sandbox that cannot read files, use the internet or display anything.</li>
+        <li><b>Surprise checks.</b> Some cells are redone by a different bee to catch cheaters. You can also run a "spot check" on your own results.</li>
+        <li><b>Originals deleted.</b> Your original texts stay on the server only while the job is running (7 days at most) and are then deleted.</li>
+        <li><b>What is kept.</b> The hive keeps the processed results so it never redoes work already done. No other user can read them: search only shows the texts of your own jobs. You can ask for them to be deleted at any time.</li>
+        <li><b>The bee doing the work can see its piece.</b> The bee processing a cell has to read it to compute it. That is why, for now, the hive only accepts non-sensitive texts.</li>
+      </ol>
+      <p class="muted small">An honest limit: a very skilled person could, in theory, peek at a single piece while it is being computed on their own PC. That is why every piece is tiny, shuffled and already scrubbed.</p>
+    </section>
+  </main>
+
+  <!-- ===================== FOR EXPERTS ===================== -->
+  <main id="v-expert" class="hidden">
+    <section class="card">
+      <h2>For experts</h2>
+      <p class="muted small">Technical details of your network of nodes.</p>
+      <pre id="expert-box"></pre>
+    </section>
+  </main>
+
+  <footer class="muted small">
+    <a href="#" data-go="privacy">Privacy in plain words</a> · <a href="#" data-go="expert">For experts</a> ·
+    <a href="https://github.com/K1m1k/hive-net" rel="noopener">Source code</a> (AGPL-3.0)
+  </footer>
+</div>
+
+<dialog id="dlg-register">
+  <h2>Hatch your bee</h2>
+  <form method="dialog" id="f-register">
+    <label class="f">Username</label><input type="text" name="username" autocomplete="username" required>
+    <label class="f">Password (at least 8 characters)</label><input type="password" name="password" autocomplete="new-password" required minlength="8">
+    <label class="check"><input type="checkbox" required> <span class="small">I accept the rules of the hive: I only upload non-sensitive texts I have the rights to; processed results stay in the shared memory (I can ask for them to be deleted); I will not try to peek at other bees' cells.</span></label>
+    <p><button class="btn" value="ok">Let's start</button> <button class="btn ghost" value="cancel" formnovalidate>Cancel</button></p>
+    <p class="small muted">Welcome gift: 100 honey.</p>
+  </form>
+</dialog>
+<dialog id="dlg-login">
+  <h2>Welcome back</h2>
+  <form method="dialog" id="f-login">
+    <label class="f">Username</label><input type="text" name="username" autocomplete="username" required>
+    <label class="f">Password</label><input type="password" name="password" autocomplete="current-password" required>
+    <p><button class="btn" value="ok">Sign in</button> <button class="btn ghost" value="cancel" formnovalidate>Cancel</button></p>
+  </form>
+</dialog>
+
+<script src="/static/f16.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
