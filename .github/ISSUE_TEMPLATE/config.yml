@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/K1m1k/hive-net/security/advisories/new
+    about: Please report security problems privately, never in a public issue.
+  - name: Commercial licence enquiry
+    url: https://github.com/K1m1k
+    about: Contact the maintainer about a commercial licence (see COMMERCIAL-LICENSE.md).

@@ -1,0 +1,28 @@
+name: Test session report
+description: Share the results of a test session (performance reports, problems, impressions).
+labels: [test-report]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing HiveNet. Attach the **job report** (.md), the **raw data** (.csv) and each **bee report**
+        (from the bee panel): they contain timings and byte counts only, never the processed texts.
+  - type: input
+    id: setup
+    attributes:
+      label: Test set-up
+      placeholder: "e.g. 1 server + 4 bees on a home network, mixed Linux/Windows PCs"
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: Results
+      description: Bottleneck shown, useful work, time remaining accuracy, anything unexpected.
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Reports
+      description: Drag and drop the .md and .csv files here.

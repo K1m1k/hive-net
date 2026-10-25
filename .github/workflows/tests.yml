@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later  (commercial licence available: see COMMERCIAL-LICENSE.md)
+# Runs every test on each push and pull request.
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: orchestrator/requirements.txt
+
+      - name: Install server dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r orchestrator/requirements.txt
+
+      - name: Bee tests (modules, sandbox, security, metrics)
+        working-directory: bee-node
+        run: npm test
+
+      - name: Network tests (real server and real bees)
+        working-directory: orchestrator
+        run: ../.venv/bin/python -m unittest discover -s tests -v

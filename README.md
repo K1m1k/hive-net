@@ -1,5 +1,9 @@
 # HiveNet — a distributed computing network (V1)
 
+[![Tests](https://github.com/K1m1k/hive-net/actions/workflows/tests.yml/badge.svg)](https://github.com/K1m1k/hive-net/actions/workflows/tests.yml)
+[![Licence: AGPL-3.0-or-later](https://img.shields.io/badge/licence-AGPL--3.0--or--later-blue.svg)](LICENSE)
+[![Commercial licence available](https://img.shields.io/badge/commercial%20licence-available-orange.svg)](COMMERCIAL-LICENSE.md)
+
 A network of private PCs that, while their owners are not using them, process texts and tables together.
 People who lend their PC earn **honey** (internal credits) and spend it to have their own texts processed.
 The server keeps the processed results and **reuses** them: work that has already been done is never redone.
@@ -190,6 +194,8 @@ bee-node/
 LICENSE             GNU AGPL-3.0-or-later
 COMMERCIAL-LICENSE.md  dual licensing: AGPL or a paid commercial licence
 CONTRIBUTING.md     how to contribute and the licensing terms for contributions
+SECURITY.md         how to report a vulnerability privately
+.github/            automated tests (GitHub Actions), issue and pull request templates
 docs/
   images/           screenshots used in this README
   example-report.md a real performance report
